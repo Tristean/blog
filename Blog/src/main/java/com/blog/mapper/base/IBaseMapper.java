@@ -2,7 +2,7 @@ package com.blog.mapper.base;
 
 import java.util.List;
 
-import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.annotations.Param;
 
 public interface IBaseMapper<T> {
 	int deleteByPrimaryKey(Integer id);
@@ -17,5 +17,7 @@ public interface IBaseMapper<T> {
 	
 	int updateByPrimaryKey(T record);
 	
-	List<T>getAllByPage(RowBounds rowBounds);
+	List<T>getAllByPage();
+	
+	List<T>selectByPage(@Param("start")int start,@Param("size")int size);
 }

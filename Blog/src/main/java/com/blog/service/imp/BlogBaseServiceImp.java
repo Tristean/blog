@@ -3,6 +3,7 @@ package com.blog.service.imp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import com.blog.dto.output.BlogDetails;
@@ -11,8 +12,8 @@ import com.blog.exception.MyException;
 import com.blog.mapper.BlogMapper;
 import com.blog.mapper.UserRoleMapper;
 import com.blog.mapper.base.IBaseMapper;
-import com.blog.service.BlogBaseService;
 import com.blog.service.base.BaseServiceImp;
+import com.blog.services.BlogBaseService;
 @Service
 public class BlogBaseServiceImp extends BaseServiceImp<Blog> implements BlogBaseService{
 	@Autowired
@@ -50,13 +51,17 @@ public class BlogBaseServiceImp extends BaseServiceImp<Blog> implements BlogBase
 	@Override
 	public List<BlogDetails> getUserBlogList(Integer userId) {
 		// TODO Auto-generated method stub
-		return blogMapper.getUserDetails(userId);
+		return blogMapper.getUserBlogDetails(userId);
 	}
 
 	@Override
 	public IBaseMapper<Blog> getBaseMapper() {
 		// TODO Auto-generated method stub
 		return blogMapper;
+	}
+	
+	public String getContext(Integer id){
+		return blogMapper.getContext(id);
 	}
 
 }

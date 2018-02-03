@@ -17,8 +17,8 @@ import com.blog.mapper.RoleMapper;
 import com.blog.mapper.UserMapper;
 import com.blog.mapper.UserRoleMapper;
 import com.blog.mapper.base.IBaseMapper;
-import com.blog.service.UserBaseService;
 import com.blog.service.base.BaseServiceImp;
+import com.blog.services.UserBaseService;
 import com.blog.util.MD5Util;
 import com.blog.util.StringUtil;
 
@@ -56,7 +56,7 @@ public class UserBaseServiceImp extends BaseServiceImp<User> implements UserBase
 			throw new MyException("该用户已存在");
 		User user=new User();
 		user.setName(username);
-		user.setPassword(password);
+		user.setPassword(MD5Util.getMD5(password.getBytes()));
 		user.setTel(tel);
 		user.setDes(des);
 		user.setLevel(1);
@@ -191,5 +191,4 @@ public class UserBaseServiceImp extends BaseServiceImp<User> implements UserBase
 		role.setName(roleName);
 		roleMapper.insertSelective(role);
 	}
-
 }

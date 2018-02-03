@@ -11,5 +11,7 @@ import com.blog.mapper.base.IBaseMapper;
 public interface BlogMapper extends IBaseMapper<Blog> {
 	public void deleteByIdAndUserId(@Param("userid")Integer userid,@Param("id")Integer id);
 	
-	public List<BlogDetails>getUserDetails(Integer userId);
+	public List<BlogDetails>getUserBlogDetails(Integer userId);
+	
+	public String getContext(Integer id);
 }

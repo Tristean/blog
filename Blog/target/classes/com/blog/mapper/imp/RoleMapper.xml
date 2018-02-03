@@ -8,6 +8,7 @@
 	<sql id="Base_Column_List">
 		id,name
 	</sql>
+	<!-- select -->
 	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
 		select
 		<include refid="Base_Column_List"/>
@@ -19,7 +20,7 @@
 		delete from b_role
 		where id=#{id,jdbcType=INTEGER}
 	</delete>
-	
+	<!-- insert -->
 	<insert id="insert" parameterType="com.blog.entity.Role">
 		insert into b_role
 		<trim prefix="(" suffix=")" suffixOverrides=",">
@@ -30,16 +31,16 @@
 				name,
 			</if>
 		</trim>
-		<trim prefix="(" suffix=")" suffixOverrides=",">
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="id!=null">
-				#{id,jdbcTpe=INTEGER}
+				#{id,jdbcType=INTEGER},
 			</if>
 			<if test="name!=null">
 				#{name,jdbcType=VARCHAR}
 			</if>
 		</trim>
 	</insert>
-	
+	<!-- update -->
 	<update id="updateByPrimaryKeySelective" parameterType="com.blog.entity.Role">
 		update b_role
 		<set>
@@ -54,7 +55,7 @@
 		set name=#{name,jdbcType=VARCHAR}
 		where id=#{id,jdbcType=INTEGER}
 	</update>
-	
+	<!-- custome -->
 	<select id="getRoleListByUserId" parameterType="java.lang.Integer" resultType="com.blog.entity.Role">
 		select r.* from b_role r
 		left join b_user_role ur on r.id=ur.roleId

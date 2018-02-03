@@ -20,6 +20,9 @@
 		from b_user
 		where id=#{id,jdbcType=INTEGER}
 	</select>
+	<select id="selectByPage" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select * from b_user limit #{start},#{size}
+	</select>
 	<!-- delete -->
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
 		delete from b_user

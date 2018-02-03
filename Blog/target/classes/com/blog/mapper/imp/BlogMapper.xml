@@ -5,36 +5,32 @@
 		<id  column="id" property="id" jdbcType="INTEGER"/>
 		<result column="title" property="title" jdbcType="VARCHAR"/>
 		<result column="des" property="des" jdbcType="VARCHAR"/>
-		<result column="userId" property="userid" jdbcType="INTEGER"/>
+		<result column="userId" property="userId" jdbcType="INTEGER"/>
 	</resultMap>
 	<resultMap type="com.blog.entity.Blog" id="ResultMapWithBLOBs" extends="BaseResultMap">
 		<result column="context" property="context" jdbcType="LONGVARCHAR"/>
 	</resultMap>
 	
 	<sql id="Base_Column_List">
-		id,title,des,userId
+		id,title,des,userId,context
 	</sql>
-	<sql id="Blob_Column_List">
-		context
-	</sql>
-	
+	<!-- select -->
 	<select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer">
 		select
 		<include refid="Base_Column_List"/>
-		<include refid="Blob_Column_List"/>
 		from b_blog
 		where id=#{id,jdbcType=INTEGER}
 	</select>
-	
+	<!-- delete -->
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
 		delete from b_blog
 		where id=#{id,jdbcType=INTEGER}
 	</delete>
-	
+	<!-- insert -->
 	<insert id="insert" parameterType="com.blog.entity.Blog">
 		insert into b_blog(id,title,des,userId,context)
 		values(#{id,jdbcType=INTEGER},#{title,jdbcType=VARCHAR},#{des,jdbcType=VARCHAR},
-		#{userid,jdbcType=INTEGER},#{context,jdbcType=LONGVARCHAR})
+		#{userId,jdbcType=INTEGER},#{context,jdbcType=LONGVARCHAR})
 	</insert>
 	<insert id="insertSelective" parameterType="com.blog.entity.Blog">
 		insert into b_blog
@@ -48,14 +44,14 @@
 			<if test="des!=null">
 				des,
 			</if>
-			<if test="userid!=null">
-				userid,
+			<if test="userId!=null">
+				userId,
 			</if>
 			<if test="context!=null">
 				context,
 			</if>
 		</trim>
-		<trim prefix="(" suffix=")" suffixOverrides=",">
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="id!=null">
 				#{id,jdbcType=INTEGER},
 			</if>
@@ -65,15 +61,15 @@
 			<if test="des!=null">
 				#{des,jdbcType=VARCHAR},
 			</if>
-			<if test="userid!=null">
-				#{userid,jdbcType=INTEGER},
+			<if test="userId!=null">
+				#{userId,jdbcType=INTEGER},
 			</if>
 			<if test="context!=null">
 				#{context,jdbcType=LONGVARCHAR},
 			</if>
 		</trim>
 	</insert>
-	
+	<!-- update -->
 	<update id="updateByPrimaryKeySelective" parameterType="com.blog.entity.Blog">
 		update b_blog
 		<set>
@@ -104,14 +100,18 @@
 		update b_blog
 		set title = #{title,jdbcType=VARCHAR},
 			des = #{des,jdbcType=VARCHAR},
-			userId = #{userid,jdbcType=VARCHAR}
+			userId = #{userId,jdbcType=VARCHAR},
+			context = #{context,jdbcType=LONGVARCHAR}
 		where id=#{id,jdbcType=INTEGER}
 	</update>
-	
+	<!-- custome -->
 	<delete id="deleteByIdAndUserId">
 		delete from b_blog where id=#{id} and userId=#{userid}
 	</delete>
 	<select id="getUserBlogDetails" resultType="com.blog.dto.output.BlogDetails">
 		select id,title,des from b_blog where userId=#{userId}
+	</select>
+	<select id="getContext" resultType="java.lang.String">
+		select context from b_blog where id=#{id}
 	</select>
 </mapper>

@@ -1,8 +1,11 @@
 package com.blog.service.base;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.blog.mapper.base.IBaseMapper;
+import com.blog.util.Page;
 
 @Service
 public abstract class BaseServiceImp<T> implements BaseService<T> {
@@ -43,5 +46,12 @@ public abstract class BaseServiceImp<T> implements BaseService<T> {
 		// TODO Auto-generated method stub
 		return this.getBaseMapper().updateByPrimaryKeySelective(record);
 	}
-
+	
+	@Override
+	public Page<T> selectByPage(int start,int size){
+		Page<T> page=new Page<T>();
+		List<T>list=this.getBaseMapper().selectByPage(start, size);
+		page.setPageData(list);
+		return page;
+	}
 }
