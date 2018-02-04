@@ -14,6 +14,7 @@ import com.blog.dto.output.BlogDetails;
 import com.blog.entity.Blog;
 import com.blog.service.imp.BlogBaseServiceImp;
 import com.blog.services.BlogBaseService;
+import com.blog.util.LuceneIndexForBlog;
 
 public class BlogSqlTest {
 	ApplicationContext app=new ClassPathXmlApplicationContext("spring.xml");
@@ -43,4 +44,19 @@ public class BlogSqlTest {
 		List<BlogDetails>blogs=bbs.getUserBlogList(3);
 		System.out.println(blogs==null);
 	}
+	@Test
+	public void test3(){
+		LuceneIndexForBlog lib=new LuceneIndexForBlog();
+		Blog blog=bbs.selectByPrimaryKey(3);
+		lib.addIndex(blog);
+	}
+	@Test
+	public void test4(){
+		Blog blog=bbs.selectByPrimaryKey(3);
+		System.out.println(blog.getDes());
+		LuceneIndexForBlog lib=new LuceneIndexForBlog();
+		List<Blog>blogs=lib.search("≤‚ ‘≤©øÕ");
+		System.out.println(blogs.size());
+	}
+
 }

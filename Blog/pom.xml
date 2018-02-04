@@ -16,7 +16,8 @@
         <mybatis.version>3.2.8</mybatis.version>  
         <!-- log4j日志文件管理包版本 -->  
         <slf4j.version>1.7.7</slf4j.version>
-        <log4j.version>1.2.16</log4j.version>   
+        <log4j.version>1.2.16</log4j.version> 
+        <lucene.version>6.0.1</lucene.version>  
     </properties>
   
   <dependencies>
@@ -207,7 +208,32 @@
             <artifactId>commons-codec</artifactId>  
             <version>1.9</version>  
         </dependency>  
-         
+         <!-- 引入lucene -->
+         <dependency>
+         	<groupId>org.apache.lucene</groupId>
+         	<artifactId>lucene-core</artifactId>
+         	<version>${lucene.version}</version>
+         </dependency>
+         <dependency>
+         	<groupId>org.apache.lucene</groupId>
+         	<artifactId>lucene-queryparser</artifactId>
+         	<version>${lucene.version}</version>
+         </dependency>
+         <dependency>
+         	<groupId>org.apache.lucene</groupId>
+         	<artifactId>lucene-analyzers-common</artifactId>
+         	<version>${lucene.version}</version>
+         </dependency>
+         <dependency>
+         	<groupId>org.apache.lucene</groupId>
+         	<artifactId>lucene-analyzers-smartcn</artifactId>
+         	<version>${lucene.version}</version>
+         </dependency>
+         <dependency>
+         	<groupId>org.apache.lucene</groupId>
+         	<artifactId>lucene-highlighter</artifactId>
+         	<version>${lucene.version}</version>
+         </dependency>
   </dependencies>
   <build>
     <finalName>Blog</finalName>

@@ -38,7 +38,4 @@ public class Blog {
 	public void setContext(String context) {
 		this.context = context;
 	}
-	
-	
-	
 }
