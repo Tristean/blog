@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.blog.mapper.ChatMessageMapper">
+	<resultMap type="com.blog.entity.ChatMessage" id="ResultMap">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="uId" property="uId" jdbcType="INTEGER"/>
+		<result column="content" property="content" jdbcType="VARCHAR"/>
+		<result column="createDate" property="createDate" jdbcType="VARCHAR" javaType="java.lang.String"/>
+	</resultMap>
+	<sql id="Column_List">
+		id,uId,content,createDate
+	</sql>
+	<!-- select -->
+	<select id="selectByPrimaryKey" resultMap="ResultMap" parameterType="java.lang.Integer">
+		select
+			<include refid="Column_List"/>
+		from b_chat
+		where id=#{id,jdbcType=INTEGER}
+	</select>
+	<!-- delete -->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete
+			from b_chat
+		where id=#{id,jdbcType=INTEGER}
+	</delete>
+	<!-- insert -->
+	<insert id="insert" parameterType="com.blog.entity.ChatMessage">
+		insert into b_chat (id,uId,content,createDate)
+		values(#{id,jdbcType=INTEGER},#{uId,jdbcType=INTEGER},#{content,jdbcType=VARCHAR},#{createDate,jdbcType=VARCHAR})
+	</insert>
+</mapper>

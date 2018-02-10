@@ -1,10 +1,13 @@
 package com.blog.websocket;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 
@@ -13,58 +16,61 @@ import org.springframework.web.socket.server.standard.SpringConfigurator;
 
 import com.blog.entity.ChatMessage;
 import com.blog.services.ChatMessageService;
+import com.blog.services.UserBaseService;
 import com.blog.util.JsonUtil;
+import com.blog.util.MapUtil;
 
-/**
- * @ServerEndpoint ×¢½âÊÇÒ»¸öÀà²ã´ÎµÄ×¢½â£¬ËüµÄ¹¦ÄÜÖ÷ÒªÊÇ½«Ä¿Ç°µÄÀà¶¨Òå³ÉÒ»¸öwebsocket·şÎñÆ÷¶Ë,
- * ×¢½âµÄÖµ½«±»ÓÃÓÚ¼àÌıÓÃ»§Á¬½ÓµÄÖÕ¶Ë·ÃÎÊURLµØÖ·,¿Í»§¶Ë¿ÉÒÔÍ¨¹ıÕâ¸öURLÀ´Á¬½Óµ½WebSocket·şÎñÆ÷¶Ë
- */
+
 @ServerEndpoint(value="/websocket",configurator=SpringConfigurator.class)
 public class WebSocketTest {
-    //¾²Ì¬±äÁ¿£¬ÓÃÀ´¼ÇÂ¼µ±Ç°ÔÚÏßÁ¬½ÓÊı¡£Ó¦¸Ã°ÑËüÉè¼Æ³ÉÏß³Ì°²È«µÄ¡£
+	@Autowired
+	ChatMessageService cms;
+	@Autowired
+	UserBaseService ubs;
+    //ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ã°ï¿½ï¿½ï¿½ï¿½ï¿½Æ³ï¿½ï¿½ß³Ì°ï¿½È«ï¿½Ä¡ï¿½
     private static int onlineCount = 0;
 
-    //concurrent°üµÄÏß³Ì°²È«Set£¬ÓÃÀ´´æ·ÅÃ¿¸ö¿Í»§¶Ë¶ÔÓ¦µÄMyWebSocket¶ÔÏó¡£ÈôÒªÊµÏÖ·şÎñ¶ËÓëµ¥Ò»¿Í»§¶ËÍ¨ĞÅµÄ»°£¬¿ÉÒÔÊ¹ÓÃMapÀ´´æ·Å£¬ÆäÖĞKey¿ÉÒÔÎªÓÃ»§±êÊ¶
+    //concurrentï¿½ï¿½ï¿½ï¿½ï¿½ß³Ì°ï¿½È«Setï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ë¶ï¿½Ó¦ï¿½ï¿½MyWebSocketï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÒªÊµï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ëµ¥Ò»ï¿½Í»ï¿½ï¿½ï¿½Í¨ï¿½ÅµÄ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½Mapï¿½ï¿½ï¿½ï¿½Å£ï¿½ï¿½ï¿½ï¿½ï¿½Keyï¿½ï¿½ï¿½ï¿½Îªï¿½Ã»ï¿½ï¿½ï¿½Ê¶
     private static CopyOnWriteArraySet<WebSocketTest> webSocketSet = new CopyOnWriteArraySet<WebSocketTest>();
 
-    //ÓëÄ³¸ö¿Í»§¶ËµÄÁ¬½Ó»á»°£¬ĞèÒªÍ¨¹ıËüÀ´¸ø¿Í»§¶Ë·¢ËÍÊı¾İ
+    //ï¿½ï¿½Ä³ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Ó»á»°ï¿½ï¿½ï¿½ï¿½ÒªÍ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     private Session session;
 
     /**
-     * Á¬½Ó½¨Á¢³É¹¦µ÷ÓÃµÄ·½·¨
-     * @param session  ¿ÉÑ¡µÄ²ÎÊı¡£sessionÎªÓëÄ³¸ö¿Í»§¶ËµÄÁ¬½Ó»á»°£¬ĞèÒªÍ¨¹ıËüÀ´¸ø¿Í»§¶Ë·¢ËÍÊı¾İ
+     * ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½ï¿½É¹ï¿½ï¿½ï¿½ï¿½ÃµÄ·ï¿½ï¿½ï¿½
+     * @param session  ï¿½ï¿½Ñ¡ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½sessionÎªï¿½ï¿½Ä³ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Ó»á»°ï¿½ï¿½ï¿½ï¿½ÒªÍ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      */
     @OnOpen
     public void onOpen(Session session){
         this.session = session;
-        webSocketSet.add(this);     //¼ÓÈësetÖĞ
-        addOnlineCount();           //ÔÚÏßÊı¼Ó1
-        System.out.println("ÓĞĞÂÁ¬½Ó¼ÓÈë£¡µ±Ç°ÔÚÏßÈËÊıÎª" + getOnlineCount());
+        webSocketSet.add(this);     //ï¿½ï¿½ï¿½ï¿½setï¿½ï¿½
+        addOnlineCount();           //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1
+        System.out.println("è¿æ¥æˆåŠŸ" + getOnlineCount());
     }
 
     /**
-     * Á¬½Ó¹Ø±Õµ÷ÓÃµÄ·½·¨
+     * ï¿½ï¿½ï¿½Ó¹Ø±Õµï¿½ï¿½ÃµÄ·ï¿½ï¿½ï¿½
      */
     @OnClose
     public void onClose(){
-        webSocketSet.remove(this);  //´ÓsetÖĞÉ¾³ı
-        subOnlineCount();           //ÔÚÏßÊı¼õ1
-        System.out.println("ÓĞÒ»Á¬½Ó¹Ø±Õ£¡µ±Ç°ÔÚÏßÈËÊıÎª" + getOnlineCount());
+        webSocketSet.remove(this);  //ï¿½ï¿½setï¿½ï¿½É¾ï¿½ï¿½
+        subOnlineCount();           //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1
+        System.out.println("å…³é—­è¿æ¥" + getOnlineCount());
     }
 
     /**
-     * ÊÕµ½¿Í»§¶ËÏûÏ¢ºóµ÷ÓÃµÄ·½·¨
-     * @param message ¿Í»§¶Ë·¢ËÍ¹ıÀ´µÄÏûÏ¢
-     * @param session ¿ÉÑ¡µÄ²ÎÊı
+     * ï¿½Õµï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ÃµÄ·ï¿½ï¿½ï¿½
+     * @param message ï¿½Í»ï¿½ï¿½Ë·ï¿½ï¿½Í¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
+     * @param session ï¿½ï¿½Ñ¡ï¿½Ä²ï¿½ï¿½ï¿½
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-    	String str=JsonUtil.parse(message);
-        System.out.println("À´×Ô¿Í»§¶ËµÄÏûÏ¢"+str);
-        //Èº·¢ÏûÏ¢
+    	HashMap<String,String> map=JsonUtil.parse(message);
+        System.out.println("å®¢æˆ·ç«¯æ¶ˆæ¯");
+        //Èºï¿½ï¿½ï¿½ï¿½Ï¢
         for(WebSocketTest item: webSocketSet){
             try {
-                item.sendMessage(str);
+                item.sendMessage(map);
             } catch (IOException e) {
                 e.printStackTrace();
                 continue;
@@ -73,23 +79,38 @@ public class WebSocketTest {
     }
 
     /**
-     * ·¢Éú´íÎóÊ±µ÷ÓÃ
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½
      * @param session
      * @param error
      */
     @OnError
     public void onError(Session session, Throwable error){
-        System.out.println("·¢Éú´íÎó");
+        System.out.println("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
         error.printStackTrace();
     }
 
     /**
-     * Õâ¸ö·½·¨ÓëÉÏÃæ¼¸¸ö·½·¨²»Ò»Ñù¡£Ã»ÓĞÓÃ×¢½â£¬ÊÇ¸ù¾İ×Ô¼ºĞèÒªÌí¼ÓµÄ·½·¨¡£
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ¼¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½×¢ï¿½â£¬ï¿½Ç¸ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½Òªï¿½ï¿½ÓµÄ·ï¿½ï¿½ï¿½ï¿½ï¿½
      * @param message
      * @throws IOException
      */
-    public void sendMessage(String message) throws IOException{
-        this.session.getBasicRemote().sendText(message);
+    public void sendMessage(HashMap<String,String> message) throws IOException{
+    	String key=MapUtil.getKey(message);
+    	String value=MapUtil.getValue(message, key);
+    	saveMessage(key,value);
+        this.session.getBasicRemote().sendText(key+":"+value);
+    }
+    
+    public void saveMessage(String key,String value){
+    	ChatMessage message=new ChatMessage();
+    	int uId=ubs.getUserID(key);
+    	String date="1997-1-20";
+    	
+    	message.setContent(value);
+    	message.setCreateDate(date);
+    	message.setuId(uId);
+    	
+    	cms.insert(message);
     }
     
     public static synchronized int getOnlineCount() {

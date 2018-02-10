@@ -5,9 +5,10 @@ import java.util.HashMap;
 import com.alibaba.fastjson.JSONObject;
 
 public class JsonUtil {
-	public static String parse(String message){
+	public static HashMap<String,String> parse(String message){
 		JSONObject json=(JSONObject) JSONObject.parse(message);
-		String str=json.getString("name")+" : "+json.getString("msg");
-		return str;
+		HashMap<String,String>map=new HashMap<String,String>();
+		map.put(json.getString("name"), json.getString("msg"));
+		return map;
 	}
 }

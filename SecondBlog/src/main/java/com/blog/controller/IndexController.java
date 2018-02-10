@@ -1,5 +1,5 @@
 package com.blog.controller;
-/*
+
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -54,4 +54,4 @@ public class IndexController {
 		
 		return AjaxResult.getOK(pageBlog);
 	}
-}*/
+}
